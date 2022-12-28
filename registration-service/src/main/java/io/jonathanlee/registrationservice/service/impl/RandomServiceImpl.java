@@ -7,18 +7,18 @@ import org.springframework.stereotype.Service;
 @Service
 public class RandomServiceImpl implements RandomService {
 
-    private static final int ID_LENGTH = 32;
+    public static final int DEFAULT_ID_LENGTH = 32;
 
-    private static final int TOKEN_VALUE_LENGTH = 64;
+    public static final int DEFAULT_TOKEN_VALUE_LENGTH = 64;
 
     @Override
     public String generateNewId() {
-        return RandomStringUtils.randomAlphanumeric(ID_LENGTH);
+        return RandomStringUtils.randomAlphanumeric(DEFAULT_ID_LENGTH);
     }
 
     @Override
     public String generateNewTokenValue() {
-        return RandomStringUtils.randomAlphanumeric(TOKEN_VALUE_LENGTH);
+        return RandomStringUtils.randomAlphanumeric(DEFAULT_TOKEN_VALUE_LENGTH);
     }
 
 }

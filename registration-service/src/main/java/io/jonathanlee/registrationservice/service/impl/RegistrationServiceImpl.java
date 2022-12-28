@@ -5,10 +5,7 @@ import io.jonathanlee.registrationservice.dto.RegistrationStatusDto;
 import io.jonathanlee.registrationservice.enums.RegistrationStatus;
 import io.jonathanlee.registrationservice.model.ApplicationUser;
 import io.jonathanlee.registrationservice.model.Token;
-import io.jonathanlee.registrationservice.service.ApplicationUserService;
-import io.jonathanlee.registrationservice.service.RandomService;
-import io.jonathanlee.registrationservice.service.RegistrationService;
-import io.jonathanlee.registrationservice.service.TokenService;
+import io.jonathanlee.registrationservice.service.*;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +24,8 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final TokenService tokenService;
 
     private final ApplicationUserService applicationUserService;
+
+    private final MailService mailService;
 
     @Override
     public RegistrationStatusDto registerNewUser(final RegistrationDto registrationDto) {
@@ -48,6 +47,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         final ApplicationUser savedApplicationUser = this.applicationUserService.persistApplicationUser(newApplicationUser);
         if (newApplicationUser.getId().equals(savedApplicationUser.getId())) {// If save was successful
+            this.mailService.sendRegistrationVerificationEmail(
+                    savedApplicationUser.getEmail(),
+                    newApplicationUser.getRegistrationVerificationToken().getValue());
             return new RegistrationStatusDto(RegistrationStatus.AWAITING_EMAIL_VERIFICATION);
         }
 
