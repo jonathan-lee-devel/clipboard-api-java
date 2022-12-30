@@ -5,27 +5,28 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class RandomServiceImplTests {
+class RandomServiceImplTests {
 
-    private RandomService randomService;
+  private RandomService randomService;
 
-    @BeforeEach
-    void beforeEach() {
-        this.randomService = new RandomServiceImpl();
-    }
+  @BeforeEach
+  void beforeEach() {
+    this.randomService = new RandomServiceImpl();
+  }
 
-    @Test
-    void testLengthOfId() {
-        final String generatedId = this.randomService.generateNewId();
+  @Test
+  void testLengthOfId() {
+    final String generatedId = this.randomService.generateNewId();
 
-        Assertions.assertEquals(RandomServiceImpl.DEFAULT_ID_LENGTH, generatedId.length());
-    }
+    Assertions.assertEquals(RandomServiceImpl.DEFAULT_ID_LENGTH, generatedId.length());
+  }
 
-    @Test
-    void testLengthOfTokenValue() {
-        final String generatedTokenValue = this.randomService.generateNewTokenValue();
+  @Test
+  void testLengthOfTokenValue() {
+    final String generatedTokenValue = this.randomService.generateNewTokenValue();
 
-        Assertions.assertEquals(RandomServiceImpl.DEFAULT_TOKEN_VALUE_LENGTH, generatedTokenValue.length());
-    }
+    Assertions.assertEquals(RandomServiceImpl.DEFAULT_TOKEN_VALUE_LENGTH,
+        generatedTokenValue.length());
+  }
 
 }
