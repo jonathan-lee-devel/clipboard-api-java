@@ -14,8 +14,9 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.time.Instant;
+import java.util.Optional;
 
-public class ApplicationUserServiceImplTests {
+class ApplicationUserServiceImplTests {
 
     private ApplicationUserService applicationUserService;
 
@@ -59,7 +60,7 @@ public class ApplicationUserServiceImplTests {
     }
 
     @Test
-    public void testFindByRegistrationVerificationToken() {
+    void testFindByRegistrationVerificationToken() {
         final Token registrationVerificationToken = new Token(
                 ObjectId.get(),
                 "123",
@@ -90,7 +91,7 @@ public class ApplicationUserServiceImplTests {
     }
 
     @Test
-    public void testFindByPasswordResetToken() {
+    void testFindByPasswordResetToken() {
         final Token registrationVerificationToken = new Token(
                 ObjectId.get(),
                 "123",
@@ -121,7 +122,7 @@ public class ApplicationUserServiceImplTests {
     }
 
     @Test
-    public void testEnableUser() {
+    void testEnableUser() {
         final Token registrationVerificationToken = new Token(
                 ObjectId.get(),
                 "123",
@@ -152,6 +153,73 @@ public class ApplicationUserServiceImplTests {
 
         Assertions.assertTrue(this.applicationUserService.enableUser(applicationUser).isEnabled());
         Assertions.assertTrue(applicationUser.isEnabled());
+    }
+
+    @Test
+    void testDeleteUser_success() {
+        final Token registrationVerificationToken = new Token(
+                ObjectId.get(),
+                "123",
+                "value",
+                Instant.now()
+        );
+        final Token passwordResetToken = new Token(
+                ObjectId.get(),
+                "123",
+                "value",
+                Instant.now()
+        );
+        final ApplicationUser applicationUser = new ApplicationUser(
+                ObjectId.get(),
+                "123",
+                "test@mail.com",
+                "password",
+                "John",
+                "Doe",
+                false,
+                registrationVerificationToken,
+                passwordResetToken
+        );
+
+        Mockito.when(this.applicationUserRepository.findById(applicationUser.getObjectId())).thenReturn(Optional.of(applicationUser));
+        Mockito.doNothing().when(this.applicationUserRepository).delete(applicationUser);
+
+        final ApplicationUser deletedUser = this.applicationUserService.deleteApplicationUser(applicationUser);
+        Assertions.assertEquals(applicationUser, deletedUser);
+    }
+
+    @Test
+    void testDeleteUser_failure() {
+        final Token registrationVerificationToken = new Token(
+                ObjectId.get(),
+                "123",
+                "value",
+                Instant.now()
+        );
+        final Token passwordResetToken = new Token(
+                ObjectId.get(),
+                "123",
+                "value",
+                Instant.now()
+        );
+        final ApplicationUser applicationUser = new ApplicationUser(
+                ObjectId.get(),
+                "123",
+                "test@mail.com",
+                "password",
+                "John",
+                "Doe",
+                false,
+                registrationVerificationToken,
+                passwordResetToken
+        );
+
+        Mockito.when(this.applicationUserRepository.findById(applicationUser.getObjectId())).thenReturn(Optional.empty());
+        Mockito.doNothing().when(this.applicationUserRepository).delete(applicationUser);
+
+        final ApplicationUser deletedUser = this.applicationUserService.deleteApplicationUser(applicationUser);
+        Assertions.assertNotEquals(applicationUser, deletedUser);
+        Assertions.assertNull(deletedUser);
     }
 
 }

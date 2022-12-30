@@ -2,10 +2,13 @@ package io.jonathanlee.registrationservice.service.impl;
 
 import io.jonathanlee.registrationservice.service.MailService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailServiceImpl implements MailService {
@@ -13,7 +16,7 @@ public class MailServiceImpl implements MailService {
     private final JavaMailSender javaMailSender;
 
     @Override
-    public void sendRegistrationVerificationEmail(final String targetEmail, final String tokenValue) {
+    public SimpleMailMessage sendRegistrationVerificationEmail(final String targetEmail, final String tokenValue) {
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(targetEmail);
         simpleMailMessage.setSubject("Clipboard E-mail Verification");
@@ -22,11 +25,17 @@ public class MailServiceImpl implements MailService {
                         String.format("https://clipboard.jonathanlee.io/register/confirm/%s", tokenValue)))
         ;
 
-        this.javaMailSender.send(simpleMailMessage);
+        try {
+            this.javaMailSender.send(simpleMailMessage);
+            return simpleMailMessage;
+        } catch (MailException mailException) {
+            log.error("Registration verification e-mail could not be sent: {}", mailException.getMessage());
+            return null;
+        }
     }
 
     @Override
-    public void sendPasswordResetEmail(final String targetEmail, final String tokenValue) {
+    public SimpleMailMessage sendPasswordResetEmail(final String targetEmail, final String tokenValue) {
         final SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(targetEmail);
         simpleMailMessage.setSubject("Clipboard Password Reset");
@@ -35,7 +44,13 @@ public class MailServiceImpl implements MailService {
                         String.format("https://clipboard.jonathanlee.io/password/reset/%s", tokenValue))
         );
 
-        this.javaMailSender.send(simpleMailMessage);
+        try {
+            this.javaMailSender.send(simpleMailMessage);
+            return simpleMailMessage;
+        } catch (MailException mailException) {
+            log.error("Password reset e-mail could not be sent: {}", mailException.getMessage());
+            return null;
+        }
     }
 
 }

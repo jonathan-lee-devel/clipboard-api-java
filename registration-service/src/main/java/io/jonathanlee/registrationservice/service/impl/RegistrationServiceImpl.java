@@ -7,12 +7,15 @@ import io.jonathanlee.registrationservice.model.ApplicationUser;
 import io.jonathanlee.registrationservice.model.Token;
 import io.jonathanlee.registrationservice.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegistrationServiceImpl implements RegistrationService {
@@ -47,9 +50,15 @@ public class RegistrationServiceImpl implements RegistrationService {
 
         final ApplicationUser savedApplicationUser = this.applicationUserService.persistApplicationUser(newApplicationUser);
         if (newApplicationUser.getId().equals(savedApplicationUser.getId())) {// If save was successful
-            this.mailService.sendRegistrationVerificationEmail(
+            final SimpleMailMessage sentSimpleMailMessage = this.mailService.sendRegistrationVerificationEmail(
                     savedApplicationUser.getEmail(),
                     newApplicationUser.getRegistrationVerificationToken().getValue());
+            if (sentSimpleMailMessage == null) {
+                final ApplicationUser deletedApplicationUser = this.applicationUserService.deleteApplicationUser(savedApplicationUser);
+                if (deletedApplicationUser == null)
+                    log.error("Failed to delete application user with ID: {}", savedApplicationUser.getId());
+                return new RegistrationStatusDto(RegistrationStatus.FAILURE);
+            }
             return new RegistrationStatusDto(RegistrationStatus.AWAITING_EMAIL_VERIFICATION);
         }
 

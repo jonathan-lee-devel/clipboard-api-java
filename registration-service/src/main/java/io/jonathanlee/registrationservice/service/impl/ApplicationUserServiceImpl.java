@@ -7,6 +7,8 @@ import io.jonathanlee.registrationservice.service.ApplicationUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ApplicationUserServiceImpl implements ApplicationUserService {
@@ -32,6 +34,17 @@ public class ApplicationUserServiceImpl implements ApplicationUserService {
     public ApplicationUser enableUser(final ApplicationUser applicationUser) {
         applicationUser.setEnabled(true);
         return this.applicationUserRepository.save(applicationUser);
+    }
+
+    @Override
+    public ApplicationUser deleteApplicationUser(ApplicationUser applicationUser) {
+        final Optional<ApplicationUser> applicationUserToDelete = this.applicationUserRepository.findById(applicationUser.getObjectId());
+        if (applicationUserToDelete.isPresent()) {
+            this.applicationUserRepository.delete(applicationUser);
+            return applicationUser;
+        } else {
+            return null;
+        }
     }
 
 }

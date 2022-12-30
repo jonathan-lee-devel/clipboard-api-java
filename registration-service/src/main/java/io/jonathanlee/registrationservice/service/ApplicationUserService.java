@@ -13,4 +13,6 @@ public interface ApplicationUserService {
 
     ApplicationUser enableUser(final ApplicationUser applicationUser);
 
+    ApplicationUser deleteApplicationUser(final ApplicationUser applicationUser);
+
 }
