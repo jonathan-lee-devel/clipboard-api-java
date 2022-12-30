@@ -14,7 +14,7 @@ import java.time.ZonedDateTime;
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
-    private static final long DEFAULT_TOKEN_EXPIRY_TIME_MINUTES = 15L;
+    public static final long DEFAULT_TOKEN_EXPIRY_TIME_MINUTES = 15L;
 
     private final RandomService randomService;
 
